@@ -3,14 +3,13 @@
 #include <stdlib.h>
 
 char **get_lines(FILE *f)
+// add a callback function for all the lines if needed,
+// right now, im not clear on the requirements
 {
     char **result = malloc(10 * sizeof(char *)); // assume 10 lines
     int result_index = 0;
-    char line[100] = "";
-    /*
-    If a line is longer than 99 chars, will write past memory.
-    use realloc() later as requierd.
-    */
+    int line_length = 100;
+    char* line = malloc(line_length*sizeof(char));
     int index = 0;
     char buffer[8];
     size_t bytes_read;
@@ -30,6 +29,16 @@ char **get_lines(FILE *f)
             }
             else
             {
+                if (line_length <= index + 1){
+                    char* new_line = realloc(line, 2*line_length*sizeof(char));
+                    if (new_line != NULL){
+                        line = new_line;
+                        line_length *= 2;
+                    }
+                    else {
+                        perror("Failed to allocate buffer");
+                    }
+                }
                 line[index++] = buffer[i];
             }
         }

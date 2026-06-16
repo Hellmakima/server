@@ -6,9 +6,9 @@ int main(){
         printf("File not found\n");
         return 1;
     }
-    char c;
-    while((c = fgetc(file)) != EOF){
-        printf("byte: %c\n", c);
+    char buffer[8];
+    while(fgets(buffer, sizeof(buffer), file) != NULL){
+        printf("byte: %s\n", buffer);
     }
     fclose(file);
     return 0;

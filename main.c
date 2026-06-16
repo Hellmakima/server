@@ -8,7 +8,7 @@ int main(){
     }
     char buffer[8];
     while(fgets(buffer, sizeof(buffer), file) != NULL){
-        printf("byte: %s\n", buffer);
+        printf("%s", buffer);
     }
     fclose(file);
     return 0;

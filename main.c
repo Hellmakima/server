@@ -1,38 +1,67 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-int main(){
-    FILE *file = fopen("text.txt", "r");
-    if(file == NULL){
-        printf("File not found\n");
-        return 1;
-    }
+char **get_lines(FILE *f)
+{
+    char **result = malloc(10 * sizeof(char *)); // assume 10 lines
+    int result_index = 0;
     char line[100] = "";
+    /*
+    If a line is longer than 99 chars, will write past memory.
+    use realloc() later as requierd.
+    */
     int index = 0;
     char buffer[8];
     size_t bytes_read;
-    while((bytes_read = fread(buffer, 1, 8, file)) > 0){
-        /*
-        fread takes destination, size, count, source,
-        returns no of things it read
-        in this case we want to make sure we capture even if there is 1 byte left in file
-        */
-        // buffer[bytes_read] = '\0';
-        for (int i = 0; i < bytes_read; i++) {
-            if (buffer[i] == '\n') {
+    while ((bytes_read = fread(buffer, 1, 8, f)) > 0)
+    {
+        for (int i = 0; i < bytes_read; i++)
+        {
+            if (buffer[i] == '\n')
+            {
                 line[index] = '\0';
-                printf("READ: %s\n", line);
+
+                result[result_index] = malloc(sizeof(char) * index);
+                strcpy(result[result_index], line);
+
+                result_index++;
                 index = 0;
-            } else {
-                line[index] = buffer[i];
-                index++;
+            }
+            else
+            {
+                line[index++] = buffer[i];
             }
         }
     }
-    if (strlen(line) > 0) {
+    if (strlen(line) > 0)
+    {
         line[index] = '\0';
-        printf("READ: %s\n", line);
+
+        result[result_index] = malloc(sizeof(char) * index);
+        strcpy(result[result_index], line);
+
+        result[result_index + 1] = NULL;
     }
+    return result;
+}
+
+int main()
+{
+    FILE *file = fopen("text.txt", "r");
+    if (file == NULL)
+    {
+        printf("File not found\n");
+        return 1;
+    }
+
+    char **lines = get_lines(file);
     fclose(file);
+
+    for (int i = 0; lines[i] != NULL; i++)
+    {
+        printf("%s\n", lines[i]);
+    }
+
     return 0;
 }

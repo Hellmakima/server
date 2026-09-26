@@ -5,3 +5,21 @@ _This is based on the [TCP from HTTP](https://www.boot.dev/lessons/83e169b2-51ce
 ~Just in C because I don't know Go.~
 Python it is
 [ChatGPT chat](https://chatgpt.com/c/6a30ad09-d58c-83ee-acac-759109752f67)
+
+run the program `uv run http`
+on another pane, `nc -v localhost 8080`
+and type things and see them appear on the other side.
+> [!NOTE]
+> `nc` sends data as you type it.
+ Pressing **Enter** typically causes the line to be sent.
+ TCP may deliver that data to your server in different-sized chunks.
+ Your `recv(8)` controls how much your program reads at a time.
+
+---
+
+Also u can try http via `curl localhost:8080` and see all it fancy headers
+`curl -I --http2 localhost:8080`
+`curl -X POST http://localhost:8080 \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Alice","age":25}'
+`

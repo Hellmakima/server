@@ -1,9 +1,12 @@
+#include <asm-generic/socket.h>
 # include <netinet/in.h>
-#include <string.h>
-# include <sys/socket.h>
+# include <stdint.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
+# include <string.h>
+# include <sys/socket.h>
+# include <unistd.h>
 
 int main (void){
     int server = socket(AF_INET, SOCK_STREAM, 0);
@@ -18,9 +21,37 @@ int main (void){
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(8080);
 
+    int yes = 1;
+    setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+    // can't see any change after this setsockport
+
     if (bind(server, (struct sockaddr*)&address, sizeof(address)) < 0) {
         perror("bind");
         exit(1);
+    }
+
+    if (listen(server, 10) < 0) {
+        perror("listen");
+        exit(1);
+    }
+
+    printf("Listening on port 8080\n");
+    while (1) {
+        int client = accept(server, NULL, NULL);
+        if (client < 0) {
+            perror("accept");
+            exit(1);
+        };
+
+        printf("client fd %d\n", client);
+
+        char* response =
+            "HTTP/1.0 200 OK\r\n"
+            "Content-Type: text/html\r\n"
+            "\r\n"
+            "<h1>HELLMAKIMA</h1>\n";
+        write(client, response, strlen(response));
+        close(client);
     }
 
     return 0;

@@ -68,18 +68,18 @@ int main (void){
             continue;
         }
 
+        char filename[512];
+        snprintf(filename, sizeof(filename),"www%s", strcmp(path, "/") == 0 ? "/index.html" : path);
+
+        struct stat info;
+        int file = -1;
+
         if (strstr(path, "..") != NULL) {
             // couldn't reach this block of code during testing, but just in case.
             stat("./www/404.html", &info);
             file = open("./www/404.html", O_RDONLY);
             snprintf(filename, sizeof(filename), "%s", "./www/404.html");
         }
-
-        char filename[512];
-        snprintf(filename, sizeof(filename),"www%s", strcmp(path, "/") == 0 ? "/index.html" : path);
-
-        struct stat info;
-        int file = -1;
 
         if (stat(filename, &info) < 0 || !S_ISREG(info.st_mode) || (file = open(filename, O_RDONLY)) < 0) {
             stat("./www/404.html", &info);

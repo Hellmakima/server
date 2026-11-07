@@ -70,14 +70,9 @@ int main (void){
 
         if (strstr(path, "..") != NULL) {
             // couldn't reach this block of code during testing, but just in case.
-            char* response =
-                "HTTP/1.0 404 OK\r\n"
-                "Content-Type: text/html\r\n"
-                "\r\n"
-                "<h1>404, btw.</h1>\n";
-            write(client, response, strlen(response));
-            close(client);
-            continue;
+            stat("./www/404.html", &info);
+            file = open("./www/404.html", O_RDONLY);
+            snprintf(filename, sizeof(filename), "%s", "./www/404.html");
         }
 
         char filename[512];
@@ -87,14 +82,9 @@ int main (void){
         int file = -1;
 
         if (stat(filename, &info) < 0 || !S_ISREG(info.st_mode) || (file = open(filename, O_RDONLY)) < 0) {
-            char* response =
-                "HTTP/1.0 404 OK\r\n"
-                "Content-Type: text/html\r\n"
-                "\r\n"
-                "<h1>404, btw.</h1>\n";
-            write(client, response, strlen(response));
-            close(client);
-            continue;
+            stat("./www/404.html", &info);
+            file = open("./www/404.html", O_RDONLY);
+            snprintf(filename, sizeof(filename), "%s", "./www/404.html");
         }
 
         char header[254];

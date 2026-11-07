@@ -51,7 +51,12 @@ def request_from_reader(req: str):
     headers = parts[0].split('\r\n')[1:]
     headers_dict = defaultdict()
     for header in headers:
-        key, value = header.split(': ')
+        try:
+            i = header.index(':')
+        except ValueError:
+            raise ValueError(f"malformed header {header}")
+        key = header[:i]
+        value = header[i+1:].strip()
         headers_dict[key] = value
     return HTTPReqest(
             request_line=RequestLine(

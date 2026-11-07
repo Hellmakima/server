@@ -2,10 +2,6 @@
 
 _This is based on the [TCP from HTTP](https://www.boot.dev/lessons/83e169b2-51ce-4fa8-96a0-031505e1008e) lesson and [video](https://youtu.be/FknTw9bJsXM?si=wBy37icexWwvlCC5)._
 
-~Just in C because I don't know Go.~
-Python it is
-[ChatGPT chat](https://chatgpt.com/c/6a30ad09-d58c-83ee-acac-759109752f67)
-
 run the program `uv run http`
 on another pane, `nc -v localhost 8080`
 and type things and see them appear on the other side.
@@ -23,3 +19,6 @@ Also u can try http via `curl localhost:8080` and see all it fancy headers
   -H "Content-Type: application/json" \
   -d '{"name":"Alice","age":25}'
 `
+---
+
+I'll be skipping the `stream` and `bytes` part of this project.

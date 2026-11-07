@@ -1,13 +1,22 @@
-#include <asm-generic/socket.h>
+# include <fcntl.h>
 # include <netinet/in.h>
 # include <stdint.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
-# include <string.h>
 # include <sys/socket.h>
-#include <sys/types.h>
+# include <sys/stat.h>
 # include <unistd.h>
+
+char *content_type(char* filename) {
+    char* dot = strrchr(filename, '.');
+    if (dot == NULL) return "text/plain";
+    if (strcmp(dot, ".html") == 0) return "text/html";
+    if (strcmp(dot, ".css") == 0) return "text/css";
+    if (strcmp(dot, ".png") == 0) return "image/png";
+    if (strcmp(dot, ".jpg") == 0) return "image/jpeg";
+    return "text/plain";
+}
 
 int main (void){
     int server = socket(AF_INET, SOCK_STREAM, 0);
@@ -44,7 +53,6 @@ int main (void){
             exit(1);
         }
 
-        printf("client fd %d\n", client);
         char request[4096];
         ssize_t n = read(client, request, sizeof(request) - 1);
         if (n <= 0) {
@@ -53,14 +61,49 @@ int main (void){
         }
 
         request[n] = '\0';
-        printf("%s", request);
 
-        char* response =
+        char method[8], path[256];
+        if (sscanf(request, "%7s %255s", method, path) != 2) {
+            close(client);
+            continue;
+        }
+
+        char filename[512];
+        snprintf(filename, sizeof(filename),"www%s", strcmp(path, "/") == 0 ? "/index.html" : path);
+
+        struct stat info;
+        int file = -1;
+
+        if (stat(filename, &info) < 0 || !S_ISREG(info.st_mode) || (file = open(filename, O_RDONLY)) < 0) {
+            char* response =
+                "HTTP/1.0 404 OK\r\n"
+                "Content-Type: text/html\r\n"
+                "\r\n"
+                "<h1>404, btw.</h1>\n";
+            write(client, response, strlen(response));
+            close(client);
+            continue;
+        }
+
+        char header[254];
+        int length = snprintf(header, sizeof(header),
             "HTTP/1.0 200 OK\r\n"
-            "Content-Type: text/html\r\n"
-            "\r\n"
-            "<h1>HELLMAKIMA</h1>\n";
-        write(client, response, strlen(response));
+            "Content-Type: %s\r\n"
+            "Content-Length: %ld\r\n"
+            "\r\n",
+            content_type(filename),
+            (long) info.st_size
+        );
+        write(client, header, length);
+
+        char buffer[4096];
+        ssize_t count;
+
+        while ((count = read(file, buffer, sizeof(buffer))) > 0) {
+            write(client, buffer, count);
+        }
+
+        close(file);
         close(client);
     }
 

@@ -68,6 +68,18 @@ int main (void){
             continue;
         }
 
+        if (strstr(path, "..") != NULL) {
+            // couldn't reach this block of code during testing, but just in case.
+            char* response =
+                "HTTP/1.0 404 OK\r\n"
+                "Content-Type: text/html\r\n"
+                "\r\n"
+                "<h1>404, btw.</h1>\n";
+            write(client, response, strlen(response));
+            close(client);
+            continue;
+        }
+
         char filename[512];
         snprintf(filename, sizeof(filename),"www%s", strcmp(path, "/") == 0 ? "/index.html" : path);
 

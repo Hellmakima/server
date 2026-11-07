@@ -1,1 +1,6 @@
-HTTP server in C inspired by [this](https://www.youtube.com/watch?v=Ye_SMJ3-ixw) video.
+# server
+
+Monorepo for HTTP server experiments.
+
+- `http-server/` - HTTP server written in C.
+- `http-from-tcp/` - HTTP server written in Python, built up from raw TCP sockets.

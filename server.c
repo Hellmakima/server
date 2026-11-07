@@ -6,6 +6,7 @@
 # include <string.h>
 # include <string.h>
 # include <sys/socket.h>
+#include <sys/types.h>
 # include <unistd.h>
 
 int main (void){
@@ -41,9 +42,18 @@ int main (void){
         if (client < 0) {
             perror("accept");
             exit(1);
-        };
+        }
 
         printf("client fd %d\n", client);
+        char request[4096];
+        ssize_t n = read(client, request, sizeof(request) - 1);
+        if (n <= 0) {
+            close(client);
+            continue;
+        }
+
+        request[n] = '\0';
+        printf("%s", request);
 
         char* response =
             "HTTP/1.0 200 OK\r\n"
